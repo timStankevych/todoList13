@@ -1,4 +1,4 @@
- import React, {useReducer, useState} from 'react';
+import React, {useReducer} from 'react';
 import './App.css';
 import {Todolist} from './Todolist';
 import {v1} from 'uuid';
@@ -8,12 +8,13 @@ import {Menu} from '@material-ui/icons';
 import {
     addTodolistAC,
     changeTodolistFilterAC,
-    changeTodolistTitleAC, FilterValuesType,
+    changeTodolistTitleAC,
+    FilterValuesType,
     removeTodolistAC,
     todolistsReducer
-} from './state/todolists-reducer'
-import {addTaskAC, changeTaskStatusAC, changeTaskTitleAC, removeTaskAC, tasksReducer} from './state/tasks-reducer';
-import {TaskPriorities, TaskStatuses, TaskType} from './api/todolists-api'
+} from './state/todolists-reducer';
+import {addTaskAC, removeTaskAC, tasksReducer, updateTaskAC} from './state/tasks-reducer';
+import {TaskPriorities, TaskStatuses, TaskType} from './api/todolists-api';
 
 export type TasksStateType = {
     [key: string]: Array<TaskType>
@@ -58,12 +59,12 @@ function AppWithReducers() {
     }
 
     function changeStatus(id: string, status: TaskStatuses, todolistId: string) {
-        const action = changeTaskStatusAC(id, status, todolistId);
+        const action = updateTaskAC(id, todolistId, {status});
         dispatchToTasks(action);
     }
 
     function changeTaskTitle(id: string, newTitle: string, todolistId: string) {
-        const action = changeTaskTitleAC(id, newTitle, todolistId);
+        const action = updateTaskAC(id, newTitle, {title: todolistId});
         dispatchToTasks(action);
     }
 
@@ -84,7 +85,12 @@ function AppWithReducers() {
     }
 
     function addTodolist(title: string) {
-        const action = addTodolistAC(title);
+        const action = addTodolistAC({
+            id: v1(),
+            addedDate: '',
+            order: 0,
+            title: title,
+        });
         dispatchToTasks(action);
         dispatchToTodolists(action);
     }
