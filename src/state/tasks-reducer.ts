@@ -3,6 +3,7 @@ import {AddTodolistActionType, RemoveTodolistActionType, SetTodolistsActionType}
 import {TaskType, todolistsAPI} from '../api/todolists-api';
 import {Dispatch} from 'redux';
 import {AppRootStateType} from './store';
+import {setAppStatusAC} from '../app/app-reducer';
 
 export type RemoveTaskActionType = {
     type: 'REMOVE-TASK',
@@ -112,25 +113,37 @@ export const setTasksAC = (tasks: Array<TaskType>, todolistId: string): SetTasks
 //thunk
 export const getTasksTC = (todolistId: string) =>
     (dispatch: Dispatch) => {
+
+    dispatch(setAppStatusAC('loading'));
     todolistsAPI.getTasks(todolistId)
         .then((res) => {
             let tasks = res.data.items;
             dispatch(setTasksAC(tasks, todolistId));
+
+            dispatch(setAppStatusAC('succeeded'));
         });
 };
 
 export const removeTaskTC = (taskId: string, todolistId: string) => (dispatch: Dispatch) => {
+
+    dispatch(setAppStatusAC('loading'));
     todolistsAPI.deleteTask(todolistId, taskId)
         .then(res => {
             dispatch(removeTaskAC(taskId, todolistId))
+
+            dispatch(setAppStatusAC('succeeded'));
         })
 }
 
 export const addTaskTC = (title: string, todolistId: string) =>
     (dispatch: Dispatch) => {
+
+    dispatch(setAppStatusAC('loading'));
     todolistsAPI.createTask(todolistId, title)
         .then(res => {
             dispatch(addTaskAC(res.data.data.item))
+
+            dispatch(setAppStatusAC('succeeded'));
         })
 }
 export type UpdateDomainTaskModelType = {
